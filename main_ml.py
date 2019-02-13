@@ -1,13 +1,14 @@
-from sklearn.model_selection import train_test_split
-import pandas as pd
 from time import time
 import timeit
 from datetime import datetime, timedelta
 from keras import utils
-from keras.models import Sequential
 from keras.callbacks import TensorBoard, EarlyStopping
-from keras.optimizers import Adadelta, Adam
-from keras.layers import Conv2D, MaxPooling2D, Flatten, BatchNormalization, Dense, Dropout
+from sklearn.model_selection import train_test_split
+import pandas as pd
+from models import build_5_layers_adadelta_optim_model
+from models import build_logistics_regression_model
+from models import build_convolutional_model
+from models import build_new_convolutional_model
 
 
 def differ_time(tm):
@@ -39,69 +40,9 @@ def get_fashionmnist_data():
     return X_test, y_test, X_train, y_train
 
 
-def build_logistics_regression_model(class_numbers=10):
-    model = Sequential()
-    model.name = 'logistics_regression_model'
-    model.add(Dense(class_numbers, input_shape=(784,), activation='softmax'))
-    model.compile(loss='categorical_crossentropy',
-                  optimizer='sgd',
-                  metrics=['accuracy'])
-    return model
-
-
-def build_8_layers_adam_optim_model(class_numbers=10):
-    model = Sequential()
-    model.name = '8_layers_adam_optim_model'
-    model.add(Dense(512, activation='relu', input_shape=(784,)))
-    model.add(Dense(416, activation='relu'))
-    model.add(Dense(256, activation='relu'))
-    model.add(Dense(128, activation='relu'))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dense(48, activation='relu'))
-    model.add(Dense(12, activation='relu'))
-    model.add(Dense(class_numbers, activation='softmax'))
-    model.compile(loss='categorical_crossentropy',
-                  optimizer=Adam(),
-                  metrics=['accuracy'])
-    return model
-
-
-def build_5_layers_adadelta_optim_model(class_numbers=10):
-    model = Sequential()
-    model.name = '5_layers_adadelta_optim_model'
-    model.add(Dense(512, activation='relu', input_shape=(784,)))
-    model.add(Dropout(0.2))
-    model.add(Dense(512, activation='relu'))
-    model.add(Dropout(0.2))
-    model.add(Dense(class_numbers, activation='softmax'))
-    model.compile(loss='categorical_crossentropy',
-                  optimizer=Adadelta(),
-                  metrics=['accuracy'])
-    return model
-
-
-def build_convolutional_model(class_numbers=10):
-    model = Sequential()
-    model.name = 'convolutional_model'
-    model.add(Conv2D(filters=64, kernel_size=3, activation='relu', input_shape=[28, 28, 1]))
-    model.add(MaxPooling2D())
-    model.add(BatchNormalization())
-    model.add(Conv2D(filters=512, kernel_size=3, activation='relu'))
-    model.add(MaxPooling2D())
-    model.add(BatchNormalization())
-    model.add(Flatten())
-    model.add(Dense(1024, activation='relu'))
-    model.add(BatchNormalization())
-    model.add(Dense(class_numbers, activation='softmax'))
-    model.compile(loss='categorical_crossentropy',
-                  optimizer=Adam(),
-                  metrics=['accuracy'])
-    return model
-
-
 def fit_and_calculate_model_score(model, data):
     test_x, test_y, train_x, train_y = data
-    if model.name != 'convolutional_model':
+    if model.name not in ['new_convolutional_model', 'convolutional_model']:
         epochs = 40
     else:
         epochs = 10
@@ -133,11 +74,12 @@ if __name__ == '__main__':
 
     mymodel1 = build_convolutional_model()
     mymodel2 = build_logistics_regression_model()
-    mymodel3 = build_8_layers_adam_optim_model()
-    mymodel4 = build_5_layers_adadelta_optim_model()
-    #model_list = [mymodel1, mymodel2, mymodel3, mymodel4]
+    mymodel3 = build_5_layers_adadelta_optim_model()
+    mymodel4 = build_new_convolutional_model()
 
-    model_list = [mymodel2]
+    #model_list = [mymodel3, mymodel1, mymodel2, mymodel4]
+
+    model_list = [mymodel4]
 
     results = {}
     for mymodel in model_list:
@@ -150,27 +92,14 @@ if __name__ == '__main__':
 
     max_mod = max(results.keys(), key=lambda k: results[k]['measure'])
     dim_name = results[max_mod]['measure']
-    print(results)
-    print('Best accurancy - our model: {}: {} '.format(max_mod, dim_name))
-
+    print('Best accurancy - model: {}: {} '.format(max_mod, dim_name))
+    for k, v in results.items():
+        print('Model: {}, {}, {}'.format(k, v['time'], v['measure']))
     print('Total ' + differ_time(timeit.default_timer() - start_time1))
+
+
 
 
 # {'logistics_regression_model': {'measure': 'validation accuracy: 0.853', 'time': 'Прошло времени: DAYS:0 HOURS:0 MIN:2 SEC:53'}}
 # Максимальное accurancy - модель: logistics_regression_model: validation accuracy: 0.853
 
-# 0.856
-# 0.897
-# 0.928
-
-# logistics_regression_model:Validation accuracy: 0.854:Прошло времени: DAYS:0 HOURS:0 MIN:3 SEC:6
-# 8_layers_adam_optim_model:Validation accuracy: 0.899:Прошло времени: DAYS:0 HOURS:0 MIN:14 SEC:28
-# 5_layers_adadelta_optim_model:Validation accuracy: 0.906:Прошло времени: DAYS:0 HOURS:0 MIN:14 SEC:8
-
-# 40 -
-# logistics_regression_model - validation accuracy: 0.852 - Прошло времени: DAYS:0 HOURS:0 MIN:2 SEC:34
-# 8_layers_adam_optim_model - validation accuracy: 0.901 - Прошло времени: DAYS:0 HOURS:0 MIN:12 SEC:43
-# 5_layers_adadelta_optim_model - validation accuracy: 0.899 - Прошло времени: DAYS:0 HOURS:0 MIN:12 SEC:44
-
-
-#python -m tensorboard.main --logdir=tenzor_logs/
