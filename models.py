@@ -1,4 +1,5 @@
-from keras.models import Sequential
+import os
+from keras.models import load_model, Sequential
 from keras.layers import Dense, Dropout
 from keras.optimizers import Adadelta, Adam
 from keras.layers import Conv2D, MaxPooling2D, Flatten, BatchNormalization
@@ -31,7 +32,8 @@ def build_5_layers_adadelta_optim_model(class_numbers=10):
 def build_convolutional_model(class_numbers=10):
     model = Sequential()
     model.name = 'convolutional_model'
-    model.add(Conv2D(filters=64, kernel_size=3, activation='relu', input_shape=[28, 28, 1]))
+    model.add(Conv2D(filters=64, kernel_size=3, activation='relu',
+                     input_shape=[28, 28, 1]))
     model.add(MaxPooling2D())
     model.add(Conv2D(filters=256, kernel_size=3, activation='relu'))
     model.add(MaxPooling2D())
@@ -51,19 +53,13 @@ def build_new_convolutional_model(class_numbers=10):
     model.add(Conv2D(filters=64, kernel_size=3, strides=1,
                      padding='same', activation='relu',
                      input_shape=[28, 28, 1]))
-    # 28*28*64
     model.add(MaxPooling2D(pool_size=2, strides=2, padding='same'))
-    # 14*14*64
     model.add(Conv2D(filters=128, kernel_size=3, strides=1,
             padding='same', activation='relu'))
-    # 14*14*128
     model.add(MaxPooling2D(pool_size=2, strides=2, padding='same'))
-    # 7*7*128
     model.add(Conv2D(filters=256, kernel_size=3, strides=1,
             padding='same', activation='relu'))
-    # 7*7*256
     model.add(MaxPooling2D(pool_size=2, strides=2, padding='same'))
-    # 4*4*256
     model.add(Flatten())
     model.add(Dense(1024, activation='relu'))
     model.add(Dropout(0.5))

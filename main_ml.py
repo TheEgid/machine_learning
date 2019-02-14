@@ -1,10 +1,13 @@
 from time import time
 import timeit
 from datetime import datetime, timedelta
+import os
 from keras import utils
+from keras.models import load_model
 from keras.callbacks import TensorBoard, EarlyStopping
 from sklearn.model_selection import train_test_split
 import pandas as pd
+import numpy as np
 from models import build_5_layers_adadelta_optim_model
 from models import build_logistics_regression_model
 from models import build_convolutional_model
@@ -40,7 +43,7 @@ def get_fashionmnist_data():
     return X_test, y_test, X_train, y_train
 
 
-def fit_and_calculate_model_score(model, data):
+def fit_save_model_get_score(model, data):
     test_x, test_y, train_x, train_y = data
     if model.name not in ['new_convolutional_model', 'convolutional_model']:
         epochs = 40
@@ -51,22 +54,31 @@ def fit_and_calculate_model_score(model, data):
     epochs_loss_limit = epochs
     board = TensorBoard(write_graph=True,
                         histogram_freq=0,
-                        log_dir='tenzor_logs/{}'.format(time()))
+                        log_dir=r'tenzor_logs/{}'.format(time()))
     earlystopping = EarlyStopping(monitor='val_loss',
                                   patience=epochs_loss_limit)
     x_no, x_validation, y_no, y_validation = train_test_split(train_x, train_y,
                                                               test_size=0.33,
                                                               random_state=42)
-    model.fit(train_x, train_y,
-              epochs=epochs,
-              verbose=1,
-              batch_size=64,
-              validation_data=(x_validation, y_validation),
-              callbacks=[board, earlystopping])
+    model_path_name = r'tenzor_models/{}.h5'.format(model.name)
+    if os.path.isfile(model_path_name):
+        print('model already exists, opening from file')
+        model = load_model(model_path_name)  # load_model_hdf5
+    else:
+        print('model does not exist, fit!')
+        model.fit(train_x, train_y,
+                  epochs=epochs,
+                  verbose=1,
+                  batch_size=64,
+                  validation_data=(x_validation, y_validation),
+                  callbacks=[board, earlystopping])
+        if os.path.exists == False:
+            os.mkdir(r'tenzor_models/')
+        model.save(model_path_name)
     return model.evaluate(test_x, test_y, verbose=0)[1]
 
 
-if __name__ == '__main__':
+def main():
     start_time1 = timeit.default_timer()
 
     X_ts, Y_ts, X_tr, Y_tr = get_fashionmnist_data()
@@ -77,14 +89,15 @@ if __name__ == '__main__':
     mymodel3 = build_5_layers_adadelta_optim_model()
     mymodel4 = build_new_convolutional_model()
 
-    #model_list = [mymodel3, mymodel1, mymodel2, mymodel4]
+    # model_list = [mymodel3, mymodel1, mymodel2, mymodel4]
 
-    model_list = [mymodel4]
+    model_list = [mymodel1]
 
     results = {}
     for mymodel in model_list:
+        print(mymodel.summary())
         start_time = timeit.default_timer()
-        score = fit_and_calculate_model_score(mymodel, mydata)
+        score = fit_save_model_get_score(mymodel, mydata)
         p1 = str(mymodel.name)
         p2 = "validation accuracy: {0:.3f}".format(score)
         p3 = differ_time(timeit.default_timer() - start_time)
@@ -99,7 +112,11 @@ if __name__ == '__main__':
 
 
 
+if __name__ == '__main__':
+    main()
 
-# {'logistics_regression_model': {'measure': 'validation accuracy: 0.853', 'time': 'Прошло времени: DAYS:0 HOURS:0 MIN:2 SEC:53'}}
-# Максимальное accurancy - модель: logistics_regression_model: validation accuracy: 0.853
+
+
+
+
 
