@@ -6,7 +6,7 @@ __pycache__/
 
 *.checkpoint
 *.env
-*.log
+!*.log
 *.txt
 images/
 tenzor_logs/
