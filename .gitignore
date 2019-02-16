@@ -9,7 +9,7 @@ __pycache__/
 !*.log
 *.txt
 images/
-tenzor_logs/
+!tenzor_logs/
 !requirements.txt
 
 
