@@ -1,5 +1,4 @@
-import os
-from keras.models import load_model, Sequential
+from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.optimizers import Adadelta, Adam
 from keras.layers import Conv2D, MaxPooling2D, Flatten, BatchNormalization
