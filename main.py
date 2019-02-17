@@ -14,6 +14,7 @@ from models import build_5_layers_adadelta_optim_model
 from models import build_logistics_regression_model
 from models import build_convolutional_model
 from models import build_new_convolutional_model
+from models import build_batch_normalization_convolutional_model
 
 
 def differ_time(tm):
@@ -61,11 +62,11 @@ def show_image(X_ts, count):
 
 
 def get_fashionmnist_data():
-    X_train, y_train = separate_data(r'G:\fashionmnist\fashion-mnist_train.csv')
+    X_train, y_train = separate_data(r'fashionmnist\fashion-mnist_train.csv')
     X_train = X_train.astype('float32') / 255
     y_train = utils.to_categorical(y_train)
 
-    X_test, y_test = separate_data(r'G:\fashionmnist\fashion-mnist_test.csv')
+    X_test, y_test = separate_data(r'fashionmnist\fashion-mnist_test.csv')
     X_test = X_test.astype('float32') / 255
     y_test = utils.to_categorical(y_test)
     return X_test, y_test, X_train, y_train
@@ -73,7 +74,8 @@ def get_fashionmnist_data():
 
 def fit_save_model_get_score(model, data):
     test_x, test_y, train_x, train_y = data
-    if model.name not in ['new_convolutional_model', 'convolutional_model']:
+    if model.name not in ['new_convolutional_model', 'convolutional_model',
+                          'batch_normalization_convolutional_model']:
         epochs = 40
     else:
         epochs = 10
@@ -151,8 +153,9 @@ if __name__ == '__main__':
     mymodel2 = build_logistics_regression_model()
     mymodel3 = build_5_layers_adadelta_optim_model()
     mymodel4 = build_new_convolutional_model()
+    mymodel5 = build_batch_normalization_convolutional_model()
 
-    models = [mymodel1, mymodel2, mymodel3, mymodel4]
+    models = [mymodel1, mymodel2, mymodel3, mymodel4, mymodel5]
 
     get_validation_accuracy(models, X_ts, Y_ts, X_tr, Y_tr)
     print('Total ' + differ_time(timeit.default_timer() - start_time1))

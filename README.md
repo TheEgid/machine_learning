@@ -33,17 +33,20 @@ python -m tensorboard.main --logdir=tenzor_logs/
 
 ### results:
 
-**Model: convolutional_model, elapsed time: DAYS:0 HOURS:0 MIN:16 SEC:49, validation accuracy: 0.908**
-
 **Model: logistics_regression_model, elapsed time: DAYS:0 HOURS:0 MIN:2 SEC:30, validation accuracy: 0.851**
 
 **Model: 5_layers_adadelta_optim_model, elapsed time: DAYS:0 HOURS:0 MIN:11 SEC:58, validation accuracy: 0.895**
 
 **Model: new_convolutional_model, elapsed time: DAYS:0 HOURS:0 MIN:29 SEC:56, validation accuracy: 0.930**
 
+**Model: convolutional_model, elapsed time: DAYS:0 HOURS:0 MIN:16 SEC:49, validation accuracy: 0.908**
+
+**Model: batch_normalization_convolutional_model, elapsed time: DAYS:0 HOURS:0 MIN:32 SEC:58, validation accuracy: 0.926**
+
 **Best accurancy - model: new_convolutional_model: validation accuracy: 0.930**
 
-**Total elapsed time: DAYS:0 HOURS:1 MIN:1 SEC:23**
+**Total elapsed time: DAYS:0 HOURS:1 MIN:34 SEC:12**
 
-![](https://www.radikal.kz/images/2019/02/16/acc.png)
-![](https://www.radikal.kz/images/2019/02/16/loss.png)
+
+![](https://www.radikal.kz/images/2019/02/17/BEZYMYNNYIbbb05c7422f19d7f.png)
+

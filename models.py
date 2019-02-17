@@ -36,7 +36,6 @@ def build_convolutional_model(class_numbers=10):
     model.add(MaxPooling2D())
     model.add(Conv2D(filters=256, kernel_size=3, activation='relu'))
     model.add(MaxPooling2D())
-    model.add(BatchNormalization())
     model.add(Flatten())
     model.add(Dense(128, activation='relu'))
     model.add(Dense(class_numbers, activation='softmax'))
@@ -62,6 +61,33 @@ def build_new_convolutional_model(class_numbers=10):
     model.add(Flatten())
     model.add(Dense(1024, activation='relu'))
     model.add(Dropout(0.5))
+    model.add(Dense(class_numbers, activation='softmax'))
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=Adam(),
+                  metrics=['accuracy'])
+    return model
+
+
+def build_batch_normalization_convolutional_model(class_numbers=10):
+    model = Sequential()
+    model.name = 'batch_normalization_convolutional_model'
+    model.add(Conv2D(filters=64, kernel_size=3, strides=1,
+                     padding='same', activation='relu',
+                     input_shape=[28, 28, 1]))
+    model.add(MaxPooling2D(pool_size=2, strides=2, padding='same'))
+    model.add(BatchNormalization())
+    model.add(Conv2D(filters=128, kernel_size=3, strides=1,
+            padding='same', activation='relu'))
+    model.add(MaxPooling2D(pool_size=2, strides=2, padding='same'))
+    model.add(BatchNormalization())
+    model.add(Conv2D(filters=256, kernel_size=3, strides=1,
+            padding='same', activation='relu'))
+    model.add(MaxPooling2D(pool_size=2, strides=2, padding='same'))
+    model.add(BatchNormalization())
+    model.add(Flatten())
+    model.add(Dense(1024, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(BatchNormalization())
     model.add(Dense(class_numbers, activation='softmax'))
     model.compile(loss='categorical_crossentropy',
                   optimizer=Adam(),
